@@ -11,6 +11,7 @@ typedef struct SpriteAnimation {
 	float targetInterval;
 	int nOfFrames;
 	int frameIndex;
+	SDL_Rect firstFrame;
 	SDL_Rect frameRect;
 } SpriteAnimation;
 

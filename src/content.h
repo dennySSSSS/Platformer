@@ -28,3 +28,5 @@ bool loadContent()
 SDL_Rect fullScreen = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
 // tilesSheet
+SDL_Rect grassMiddleSrc = { 16, 0, 16, 16 };
+SDL_Rect dirtSrc = { 16, 16, 16, 16 };

@@ -20,6 +20,7 @@ void initSpriteAnimation(SpriteAnimation* animation, Sprite* sheet,
 	// Init provided values
 	animation->sheet = sheet;
 	animation->frameRect = firstFrame;
+	animation->firstFrame = firstFrame;
 	animation->nOfFrames = nOfFrames;
 
 	// Init runtime values
@@ -37,9 +38,13 @@ void updateAnimation(SpriteAnimation* animation, float dt)
 		// Update to next frame
 		animation->frameIndex++;
 		if (animation->frameIndex >= animation->nOfFrames)
+		{
 			animation->frameIndex = 0;
+			animation->frameRect.x = animation->firstFrame.x;
+		}
 
-		animation->frameRect.x = animation->frameRect.w * animation->frameIndex;
+		animation->frameRect.x = animation->firstFrame.x + animation->frameRect.w * animation->frameIndex;
+		// animation->frameRect.x = animation->frameRect.w * animation->frameIndex;
 
 		// Update timer
 		animation->frameInterval -= animation->targetInterval;
@@ -62,5 +67,6 @@ void resetAnimation(SpriteAnimation* animation)
 {
 	animation->frameInterval = .0f;
 	animation->frameIndex = 0;
-	animation->frameRect.x = animation->frameRect.w * animation->frameIndex;
+	animation->frameRect.x = animation->firstFrame.x;
+	// animation->frameRect.w * animation->frameIndex;
 }
