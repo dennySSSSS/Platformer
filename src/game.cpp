@@ -1,23 +1,25 @@
 ﻿#include "content.h"
 #include <stdlib.h>
 #include <time.h>
+#include <string>
 
 const int levelWidth = 20;
 const int levelHeight = 12;
 const int tileSize = 64;
-short level[levelHeight][levelWidth] = {
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'},
-	{'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0', 'G0'},
-	{'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM', 'DM'}};
+SDL_Rect walkable[levelHeight][levelWidth];
+char level[levelHeight][levelWidth] = {
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+	{'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G'},
+	{'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'}};
 
 int direction;
 const int movingUp = 0;
@@ -66,7 +68,7 @@ void movement(float dt)
 	}
 
 	isMoving = false;
-	//resetAnimation(&moving);
+	resetAnimation(&moving);
 }
 
 void update(float dt)
@@ -77,12 +79,26 @@ void update(float dt)
 	// updateAnimation(&moving, dt);
 
 	movement(dt);
+
+	// falling
+	SDL_Rect updatedPlayer = playerDst;
+	updatedPlayer.y++;
+	bool falling = true;
+	for (int row = 0; row < levelHeight; row++)
+		for (int col = 0; col < levelWidth; col++)
+			if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))
+			{
+				falling = false;
+				break;
+			}
+	if (falling)
+		playerDst.y += 5;
 }
 
 void draw(float dt)
 {
 	// clear screen
-	SDL_SetRenderDrawColor(renderer, 95, 205, 228,  255);
+	SDL_SetRenderDrawColor(renderer, 95, 205, 228, 255);
 	SDL_RenderClear(renderer);
 
 	// background
@@ -90,17 +106,21 @@ void draw(float dt)
 	{
 		for (int col = 0; col < levelWidth; col++)
 		{
-			SDL_Rect dst = { col * tileSize, row * tileSize, tileSize, tileSize };
-			if(level[row][col] == 'DM')
+			SDL_Rect dst = {col * tileSize, row * tileSize, tileSize, tileSize};
+			if (level[row][col] == 'D')
+			{
 				drawSprite(renderer, sheet, dirtSrc, dst);
-			else if(level[row][col] == 'G0')
+				walkable[row][col] = dst;
+			}
+			else if (level[row][col] == 'G')
+			{
 				drawSprite(renderer, sheet, grassMiddleSrc, dst);
-
+				walkable[row][col] = dst;
+			}
 		}
 	}
 
 	drawAnimatedSprite(renderer, &moving, playerDst);
-
 }
 void endGame()
 {
