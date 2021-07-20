@@ -5,9 +5,9 @@
 #include <string.h>
 #include <time.h>
 #include "SDL2/SDL.h"
-#include "config.h"
-#include "sprite.h"
-#include "game.h"
+#include "config.hpp"
+#include "sprite.hpp"
+#include "game.hpp"
 
 // Extern variables from game.h
 SDL_Window* window;

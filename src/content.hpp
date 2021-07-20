@@ -1,11 +1,11 @@
 #pragma once
 
 #include "SDL2/SDL.h"
-#include "spriteAnimation.h"
-#include "config.h"
-#include "sprite.h"
-#include "game.h"
-#include "level.h"
+#include "spriteAnimation.hpp"
+#include "config.hpp"
+#include "sprite.hpp"
+#include "game.hpp"
+#include "level.hpp"
 #include <stdlib.h>
 
 // Sheet
