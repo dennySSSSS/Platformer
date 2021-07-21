@@ -41,7 +41,6 @@ Draw animated sprite at defined position.
 \param destination Destination rectangle on screen
 */
 void drawAnimatedSprite(SDL_Renderer *renderer, SpriteAnimation* animation, SDL_Rect destination);
-void drawAnimatedSpriteInverted(SDL_Renderer *renderer, SpriteAnimation* animation, SDL_Rect destination);
 
 /*!
 Reset animation state to begining.

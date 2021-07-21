@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "SDL2/SDL.h"
+// #include "SDL2/SDL.h"
 #include "config.hpp"
-#include "sprite.hpp"
 #include "game.hpp"
 
 // Extern variables from game.h

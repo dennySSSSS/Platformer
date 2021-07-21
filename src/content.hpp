@@ -5,8 +5,7 @@
 #include "config.hpp"
 #include "sprite.hpp"
 #include "game.hpp"
-#include "level.hpp"
-#include <stdlib.h>
+// #include "level.hpp"
 
 // Sheet
 const int charSize = 16;

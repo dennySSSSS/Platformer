@@ -56,13 +56,6 @@ void drawAnimatedSprite(SDL_Renderer *renderer, SpriteAnimation* animation, SDL_
 	drawSprite(renderer, animation->sheet, animation->frameRect, destination);
 }
 
-
-// void drawAnimatedSpriteInverted(SDL_Renderer *renderer, SpriteAnimation* animation, SDL_Rect destination)
-// {
-// 	flip = SDL_FLIP_HORIZONTAL;
-// 	SDL_RendercopyEx(renderer, animation->sheet, aninmation->frameRect, destination, NULL, NULL, flip);
-// }
-
 void resetAnimation(SpriteAnimation* animation)
 {
 	animation->frameInterval = .0f;
