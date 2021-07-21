@@ -98,11 +98,13 @@ void update(float dt)
 	{
 		for (int row = 0; row < levelHeight; row++)
 			for (int col = 0; col < levelWidth; col++)
-				if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))
-				{
+			{
+				if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))	{
 					player.isFalling = false;
-					break;
+					while (SDL_HasIntersection(&player.dst, &walkable[row][col]))
+						player.dst.y--;
 				}
+			}
 		if (player.isFalling)
 			player.dst.y += 8;
 	}
@@ -133,18 +135,18 @@ void draw(float dt)
 				// drawSprite(renderer, sheet, dirtSrc, dst);
 				walkable[row][col] = dst;
 
-				if (level[row][col + 1] == 'D' && level[row][col - 1] == 'D' && level[row+1][col] == '0')
-					drawSprite(renderer, sheet, dirtBotSrc, dst);						// dirt bottom
+				if (level[row][col + 1] == 'D' && level[row][col - 1] == 'D' && level[row + 1][col] == '0')
+					drawSprite(renderer, sheet, dirtBotSrc, dst); // dirt bottom
 				else if (level[row + 1][col] == '0' && level[row][col + 1] == '0')
-					drawSprite(renderer, sheet, dirtBotRightSrc, dst);					// dirt bottom right
+					drawSprite(renderer, sheet, dirtBotRightSrc, dst); // dirt bottom right
 				else if (level[row + 1][col] == '0' && level[row][col - 1] == '0')
-					drawSprite(renderer, sheet, dirtBotLeftSrc, dst);					// dirt bottom left
+					drawSprite(renderer, sheet, dirtBotLeftSrc, dst); // dirt bottom left
 				else if (level[row][col + 1] == '0' && level[row + 1][col] == 'D')
-					drawSprite(renderer, sheet, dirtRightSrc, dst);						// dir right
+					drawSprite(renderer, sheet, dirtRightSrc, dst); // dir right
 				else if (level[row][col - 1] == '0' && level[row + 1][col] == 'D')
-					drawSprite(renderer, sheet, dirtLeftSrc, dst);						// dirt left
+					drawSprite(renderer, sheet, dirtLeftSrc, dst); // dirt left
 				else
-					drawSprite(renderer, sheet, dirtSrc, dst);							// dirt middle
+					drawSprite(renderer, sheet, dirtSrc, dst); // dirt middle
 			}
 			else if (level[row][col] == 'G')
 			{
