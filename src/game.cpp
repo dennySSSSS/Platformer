@@ -33,7 +33,7 @@ struct Player
 	bool isJumping;
 	bool isFalling;
 	int direction;
-	int speed = 300;
+	int speed = 250;
 	SDL_Rect dst;
 };
 Player player;
@@ -49,6 +49,11 @@ void startGame()
 
 void movement(float dt)
 {
+	if (keyStates[SDL_SCANCODE_SPACE] && !player.isJumping && !player.isFalling)
+	{
+		player.isJumping = true;
+		maxHeight = player.dst.y - 100;
+	}
 	if (keyStates[SDL_SCANCODE_A])
 	{
 		if (player.direction != movingLeft)
@@ -73,11 +78,7 @@ void movement(float dt)
 		updateAnimation(&moving, dt);
 		return;
 	}
-	if (keyStates[SDL_SCANCODE_SPACE] && !lastKeyStates[SDL_SCANCODE_SPACE] && !player.isJumping && !player.isFalling)
-	{
-		player.isJumping = true;
-		maxHeight = player.dst.y - 100;
-	}
+	
 
 	player.isMoving = false;
 	resetAnimation(&moving);
@@ -88,11 +89,9 @@ void update(float dt)
 	if (keyStates[SDL_SCANCODE_ESCAPE] && !lastKeyStates[SDL_SCANCODE_ESCAPE])
 		isRunning = false;
 
-	// updateAnimation(&moving, dt);
-
 	movement(dt);
 
-	// player.isFalling
+	// Falling
 	SDL_Rect updatedPlayer = player.dst;
 	updatedPlayer.y++;
 	player.isFalling = true;
@@ -109,6 +108,7 @@ void update(float dt)
 			player.dst.y += 8;
 	}
 
+	// Jumping
 	if (player.isJumping)
 	{
 		player.dst.y -= 8;
