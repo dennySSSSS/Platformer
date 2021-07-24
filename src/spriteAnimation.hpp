@@ -16,7 +16,7 @@ typedef struct SpriteAnimation {
 } SpriteAnimation;
 
 /*!
-Anitialize sprite animation.
+Initialize sprite animation.
 \param animation Pointer to SpriteAnimation structure
 \param sheet Sprite sheet with animation
 \param firstFrame Rectangle defining first frame of animation
