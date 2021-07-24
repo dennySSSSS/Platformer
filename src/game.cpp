@@ -26,16 +26,8 @@ const int movingRight = 1;
 const int movingDown = 2;
 const int movingLeft = 3;
 int maxHeight;
+SDL_Rect updatedPlayer;
 
-struct Player
-{
-	bool isMoving;
-	bool isJumping;
-	bool isFalling;
-	int direction;
-	int speed = 250;
-	SDL_Rect dst;
-};
 Player player;
 
 void startGame()
@@ -45,6 +37,37 @@ void startGame()
 
 	player.dst = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, charSize * 2, charSize * 2};
 	initSpriteAnimation(&moving, sheet, movingFirstFrame, 3, 7);
+}
+
+bool loadContent()
+{
+	sheet = loadSprite(renderer, "assets/tileset_16x16.png");
+
+	if (sheet)
+		return true;
+	return false;
+}
+
+void jump()
+{
+	if (player.isJumping)
+	{
+		player.dst.y -= 10;
+
+		// head bang
+		for (int row = 0; row < levelHeight; row++)
+			for (int col = 0; col < levelWidth; col++)
+			{
+				while (SDL_HasIntersection(&player.dst, &walkable[row][col]))
+				{
+					player.dst.y++;		// Gets updated player on the edge of block
+					player.isJumping = false;
+				}
+			}
+
+		if (player.dst.y <= maxHeight)
+			player.isJumping = false;
+	}
 }
 
 void movement(float dt)
@@ -89,9 +112,11 @@ void update(float dt)
 		isRunning = false;
 
 	movement(dt);
+	if(player.isJumping)
+		jump();
 
 	// Falling
-	SDL_Rect updatedPlayer = player.dst;
+	updatedPlayer = player.dst;
 	updatedPlayer.y++;
 	player.isFalling = true;
 	if (!player.isJumping)
@@ -99,7 +124,8 @@ void update(float dt)
 		for (int row = 0; row < levelHeight; row++)
 			for (int col = 0; col < levelWidth; col++)
 			{
-				if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))	{
+				if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))
+				{
 					player.isFalling = false;
 					while (SDL_HasIntersection(&player.dst, &walkable[row][col]))
 						player.dst.y--;
@@ -110,12 +136,6 @@ void update(float dt)
 	}
 
 	// Jumping
-	if (player.isJumping)
-	{
-		player.dst.y -= 15;
-		if (player.dst.y <= maxHeight)
-			player.isJumping = false;
-	}
 }
 
 void draw(float dt)
