@@ -60,7 +60,7 @@ void jump()
 			{
 				while (SDL_HasIntersection(&player.dst, &walkable[row][col]))
 				{
-					player.dst.y++;		// Gets updated player on the edge of block
+					player.dst.y++; // Gets updated player on the edge of block
 					player.isJumping = false;
 				}
 			}
@@ -112,30 +112,101 @@ void update(float dt)
 		isRunning = false;
 
 	movement(dt);
-	if(player.isJumping)
+	if (player.isJumping)
 		jump();
 
 	// Falling
-	updatedPlayer = player.dst;
-	updatedPlayer.y++;
 	player.isFalling = true;
 	if (!player.isJumping)
 	{
+		updatedPlayer = player.dst;
+		updatedPlayer.y++;
+		player.dst.y++;
 		for (int row = 0; row < levelHeight; row++)
 			for (int col = 0; col < levelWidth; col++)
 			{
 				if (SDL_HasIntersection(&updatedPlayer, &walkable[row][col]))
 				{
-					player.isFalling = false;
 					while (SDL_HasIntersection(&player.dst, &walkable[row][col]))
+					{
 						player.dst.y--;
+					}
+					player.isFalling = false;
 				}
 			}
 		if (player.isFalling)
-			player.dst.y += 8;
+			player.dst.y += 300 * dt;
+
+		player.dst.y--;
 	}
 
-	// Jumping
+	// Respwan
+	if (!SDL_HasIntersection(&player.dst, &fullScreen))
+	{
+		player.dst.x = WINDOW_WIDTH / 2;
+		player.dst.y = WINDOW_HEIGHT / 2;
+	}
+}
+
+SDL_Rect worldToScreen(float camX, float camY, SDL_Rect worldRect)
+{
+	SDL_Rect screenRect = worldRect;
+	// Apply camera as if the target of camera is the top left corner
+	screenRect.x -= (int)(camX + .5f);
+	screenRect.y -= (int)(camY + .5f);
+
+	// Move camera in a way its position is center of the window
+	screenRect.x += WINDOW_WIDTH / 2;
+	screenRect.y += WINDOW_HEIGHT / 2;
+
+	return screenRect;
+}
+
+void drawLevel()
+{
+	SDL_Rect worldDestination = {0, 0, tileSize, tileSize};
+	// background
+	for (int row = 0; row < levelHeight; row++)
+	{
+		for (int col = 0; col < levelWidth; col++)
+		{
+			SDL_Rect dst = {col * tileSize, row * tileSize, tileSize, tileSize};
+			worldDestination.x = col * tileSize;
+			worldDestination.y = row * tileSize;
+			SDL_Rect screenDestination = worldToScreen(player.dst.x, player.dst.y, worldDestination);
+
+			if (level[row][col] == 'D')
+			{
+				// drawSprite(renderer, sheet, dirtSrc, dst);
+				walkable[row][col] = screenDestination;
+
+				if (level[row][col + 1] == 'D' && level[row][col - 1] == 'D' && level[row + 1][col] == '0')
+					drawSprite(renderer, sheet, dirtBotSrc, screenDestination); // dirt bottom
+				else if (level[row + 1][col] == '0' && level[row][col + 1] == '0')
+					drawSprite(renderer, sheet, dirtBotRightSrc, screenDestination); // dirt bottom right
+				else if (level[row + 1][col] == '0' && level[row][col - 1] == '0')
+					drawSprite(renderer, sheet, dirtBotLeftSrc, screenDestination); // dirt bottom left
+				else if (level[row][col + 1] == '0' && level[row + 1][col] == 'D')
+					drawSprite(renderer, sheet, dirtRightSrc, screenDestination); // dir right
+				else if (level[row][col - 1] == '0' && level[row + 1][col] == 'D')
+					drawSprite(renderer, sheet, dirtLeftSrc, screenDestination); // dirt left
+				else
+					drawSprite(renderer, sheet, dirtSrc, screenDestination); // dirt middle
+			}
+			else if (level[row][col] == 'G')
+			{
+				// drawSprite(renderer, sheet, grassMiddleSrc, dst);
+				walkable[row][col] = screenDestination;
+
+				if (level[row][col + 1] == '0')
+					drawSprite(renderer, sheet, grassRightSrc, screenDestination);
+				else if (level[row][col - 1] == '0')
+					drawSprite(renderer, sheet, grassLeftSrc, screenDestination);
+				else
+					drawSprite(renderer, sheet, grassMiddleSrc, screenDestination);
+			}
+		}
+	}
 }
 
 void draw(float dt)
@@ -144,44 +215,7 @@ void draw(float dt)
 	SDL_SetRenderDrawColor(renderer, 95, 205, 228, 255);
 	SDL_RenderClear(renderer);
 
-	// background
-	for (int row = 0; row < levelHeight; row++)
-	{
-		for (int col = 0; col < levelWidth; col++)
-		{
-			SDL_Rect dst = {col * tileSize, row * tileSize, tileSize, tileSize};
-			if (level[row][col] == 'D')
-			{
-				// drawSprite(renderer, sheet, dirtSrc, dst);
-				walkable[row][col] = dst;
-
-				if (level[row][col + 1] == 'D' && level[row][col - 1] == 'D' && level[row + 1][col] == '0')
-					drawSprite(renderer, sheet, dirtBotSrc, dst); // dirt bottom
-				else if (level[row + 1][col] == '0' && level[row][col + 1] == '0')
-					drawSprite(renderer, sheet, dirtBotRightSrc, dst); // dirt bottom right
-				else if (level[row + 1][col] == '0' && level[row][col - 1] == '0')
-					drawSprite(renderer, sheet, dirtBotLeftSrc, dst); // dirt bottom left
-				else if (level[row][col + 1] == '0' && level[row + 1][col] == 'D')
-					drawSprite(renderer, sheet, dirtRightSrc, dst); // dir right
-				else if (level[row][col - 1] == '0' && level[row + 1][col] == 'D')
-					drawSprite(renderer, sheet, dirtLeftSrc, dst); // dirt left
-				else
-					drawSprite(renderer, sheet, dirtSrc, dst); // dirt middle
-			}
-			else if (level[row][col] == 'G')
-			{
-				// drawSprite(renderer, sheet, grassMiddleSrc, dst);
-				walkable[row][col] = dst;
-
-				if (level[row][col + 1] == '0')
-					drawSprite(renderer, sheet, grassRightSrc, dst);
-				else if (level[row][col - 1] == '0')
-					drawSprite(renderer, sheet, grassLeftSrc, dst);
-				else
-					drawSprite(renderer, sheet, grassMiddleSrc, dst);
-			}
-		}
-	}
+	drawLevel();
 
 	drawAnimatedSprite(renderer, &moving, player.dst);
 }
